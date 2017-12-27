@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Mvc;
 using SportsStore.Domain.Entities;
 using SportsStore.Domain.Abstract;
+using SportsStore.Domain.Concrete;
 
 namespace SportsStore.Web.UI.Infrastructure
 {
@@ -31,7 +32,7 @@ namespace SportsStore.Web.UI.Infrastructure
                 new Product{Name="Running shoes", Price=95}
             });
 
-            kernel.Bind<IProductsRepository>().ToConstant(mock.Object);
+            kernel.Bind<IProductsRepository>().To<EFProductRepository>();
         }
 
         public object GetService(Type serviceType)

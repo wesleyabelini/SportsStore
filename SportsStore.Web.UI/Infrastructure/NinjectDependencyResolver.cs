@@ -8,6 +8,9 @@ using System.Web.Mvc;
 using SportsStore.Domain.Entities;
 using SportsStore.Domain.Abstract;
 using SportsStore.Domain.Concrete;
+using System.Configuration;
+using SportsStore.Web.UI.Infrastructure.Abstract;
+using SportsStore.Web.UI.Infrastructure.Concrete;
 
 namespace SportsStore.Web.UI.Infrastructure
 {
@@ -23,16 +26,15 @@ namespace SportsStore.Web.UI.Infrastructure
 
         private void AddBindings()
         {
-            Mock<IProductsRepository> mock = new Mock<IProductsRepository>();
-
-            mock.Setup(m => m.Products).Returns(new List<Product>
-            {
-                new Product{Name="Football", Price=25},
-                new Product{Name="Surf board", Price=179},
-                new Product{Name="Running shoes", Price=95}
-            });
-
             kernel.Bind<IProductsRepository>().To<EFProductRepository>();
+
+            EmailSettings emailSettings = new EmailSettings
+            {
+                WriteAsFile = bool.Parse(ConfigurationManager.AppSettings["Email.WriteAsFile"] ?? "false")
+            };
+
+            kernel.Bind<IOrderProcessor>().To<EmailOrderProcessor>().WithConstructorArgument("settings", emailSettings);
+            kernel.Bind<IAuthProvider>().To<FormsAuthProvider>();
         }
 
         public object GetService(Type serviceType)
